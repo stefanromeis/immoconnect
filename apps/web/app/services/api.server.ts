@@ -1,4 +1,4 @@
-import type { Property, Request, DashboardMetrics } from "~/types";
+import type { Property, Request, DashboardMetrics, ActionToken } from "~/types";
 
 const API_BASE = process.env.API_URL || "http://localhost:3001";
 
@@ -46,5 +46,57 @@ export async function updateRequestStatus(
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ status }),
+  });
+}
+
+// --- Magic link / token auth ---
+
+type TokenValidResult =
+  | { valid: true; token: ActionToken; request?: Request }
+  | { valid: false; email?: string };
+
+export async function validateToken(id: string): Promise<TokenValidResult> {
+  try {
+    return await apiFetch<TokenValidResult>(`/api/auth/token/${id}`);
+  } catch (err) {
+    if (err instanceof Response && err.status === 410) {
+      return err.json() as Promise<TokenValidResult>;
+    }
+    throw err;
+  }
+}
+
+export async function actOnToken(
+  id: string,
+  body: Record<string, string>
+): Promise<{ ok: boolean; status?: string }> {
+  return apiFetch(`/api/auth/token/${id}/act`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+}
+
+export async function requestMagicLink(
+  email: string,
+  scope: string,
+  resourceId: string
+): Promise<{ ok: boolean }> {
+  return apiFetch("/api/auth/request-link", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, scope, resourceId }),
+  });
+}
+
+export async function resendMagicLink(
+  email: string,
+  scope: string,
+  resourceId: string
+): Promise<{ ok: boolean }> {
+  return apiFetch("/api/auth/resend", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, scope, resourceId }),
   });
 }

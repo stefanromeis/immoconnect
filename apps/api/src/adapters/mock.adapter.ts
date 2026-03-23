@@ -3,6 +3,7 @@ import type {
   Request,
   DashboardMetrics,
   RequestStatus,
+  Recipient,
 } from "@immoconnect/shared";
 import type { PropertyManagementAdapter } from "./adapter.js";
 
@@ -191,6 +192,13 @@ const metrics: DashboardMetrics = {
   requestsTrend: 2,
 };
 
+const recipients: Recipient[] = [
+  { id: "rec1", email: "johannes.doe@beispiel.de", name: "Johannes Doe", role: "landlord" },
+  { id: "rec2", email: "mueller@beispiel.de", name: "Müller, J.", role: "tenant", unitId: "u1-1", propertyId: "p1" },
+  { id: "rec3", email: "weber@beispiel.de", name: "Weber, K.", role: "tenant", unitId: "u1-3", propertyId: "p1" },
+  { id: "rec4", email: "wolf@beispiel.de", name: "Wolf, D.", role: "tenant", unitId: "u2-4", propertyId: "p2" },
+];
+
 export class MockAdapter implements PropertyManagementAdapter {
   async getProperties(): Promise<Property[]> {
     return properties;
@@ -220,5 +228,9 @@ export class MockAdapter implements PropertyManagementAdapter {
 
   async getMetrics(): Promise<DashboardMetrics> {
     return metrics;
+  }
+
+  async getRecipientByEmail(email: string): Promise<Recipient | undefined> {
+    return recipients.find((r) => r.email === email);
   }
 }

@@ -51,6 +51,27 @@ export interface Request {
   attachments?: string[];
 }
 
+export type TokenScope = "approve-request" | "view-unit" | "submit-repair";
+
+export interface ActionToken {
+  id: string;
+  email: string;
+  scope: TokenScope;
+  resourceId: string;
+  expiresAt: string;
+  usedAt?: string;
+  createdAt: string;
+}
+
+export interface Recipient {
+  id: string;
+  email: string;
+  name: string;
+  role: "tenant" | "landlord";
+  unitId?: string;
+  propertyId?: string;
+}
+
 export interface DashboardMetrics {
   totalRent: number;
   rentTrend: number;

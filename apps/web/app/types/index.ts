@@ -7,4 +7,7 @@ export type {
   RequestType,
   Priority,
   UnitStatus,
+  ActionToken,
+  TokenScope,
+  Recipient,
 } from "@immoconnect/shared";
