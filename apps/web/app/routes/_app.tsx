@@ -1,4 +1,5 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
+import { redirect } from "@remix-run/node";
 import { Outlet, useLocation } from "@remix-run/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sidebar } from "~/components/Sidebar";
@@ -6,7 +7,11 @@ import { TopBar } from "~/components/TopBar";
 import { requireAuth } from "~/services/session.server";
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  await requireAuth(request);
+  const session = await requireAuth(request);
+  const role = session.get("role");
+  if (role === "admin") {
+    throw redirect("/admin");
+  }
   return null;
 }
 

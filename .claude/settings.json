@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm --filter @immoconnect/web typecheck)",
+      "Bash(git stash:*)"
+    ]
+  }
+}

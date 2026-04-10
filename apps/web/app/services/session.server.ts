@@ -1,4 +1,5 @@
 import { createCookieSessionStorage, redirect } from "@remix-run/node";
+import type { UserRole } from "~/types";
 
 const sessionStorage = createCookieSessionStorage({
   cookie: {
@@ -24,9 +25,24 @@ export async function requireAuth(request: Request) {
   return session;
 }
 
-export async function createUserSession(redirectTo: string) {
+export async function requireAdmin(request: Request) {
+  const session = await requireAuth(request);
+  const role = session.get("role") as UserRole | undefined;
+  if (role !== "admin") {
+    throw redirect("/dashboard");
+  }
+  return session;
+}
+
+export async function getUserRole(request: Request): Promise<UserRole> {
+  const session = await getSession(request);
+  return (session.get("role") as UserRole | undefined) ?? "vermieter";
+}
+
+export async function createUserSession(role: UserRole, redirectTo: string) {
   const session = await sessionStorage.getSession();
   session.set("isLoggedIn", true);
+  session.set("role", role);
   return redirect(redirectTo, {
     headers: {
       "Set-Cookie": await sessionStorage.commitSession(session),
